@@ -19,6 +19,48 @@ The wormhole also supports CFNotificationCenter Darwin Notifications in an effor
 }];
 ```
 
+## This Fork
+
+This MMWormhole fork adds subclass MMQueuedWormhole, with which every message given to passMessageObject:identifier: is received in order by multiple calls to messageWithIdentifier:.
+
+So instead of this behaviour with MMWormhole:
+
+```objective-c
+[self.wormhole passMessageObject:@(1) identifier:@"test"];
+[self.wormhole passMessageObject:@(2) identifier:@"test"];
+id messageObject = [self.wormhole messageWithIdentifier:@"test"]; // 2
+messageObject = [self.wormhole messageWithIdentifier:@"test"]; // 2
+```
+
+MMQueuedWormhole gives you:
+
+```objective-c
+[self.queuedWormhole passMessageObject:@(1) identifier:@"test"];
+[self.queuedWormhole passMessageObject:@(2) identifier:@"test"];
+messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // 1
+messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // 2
+messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
+```
+
+Also, listening works like this:
+
+```objective-c
+[self.queuedWormhole passMessageObject:@(1) identifier:@"test"];
+[self.queuedWormhole passMessageObject:@(2) identifier:@"test"];
+[self.queuedWormhole listenForMessageWithIdentifier:@"test" listener:^(id messageObject) { NSLog(@"%@", messageObject); }];
+[self.queuedWormhole passMessageObject:@(3) identifier:@"test"]; // lister logs: 3
+messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
+[self.queuedWormhole stopListeningForMessageWithIdentifier:@"test"];
+
+[self.queuedWormhole passMessageObject:@(4) identifier:@"test"];
+[self.queuedWormhole passMessageObject:@(5) identifier:@"test"];
+[self.queuedWormhole listenForMessageWithIdentifier:@"test" listener:^(id messageObject) {
+    for (id eachMessageObject; (eachMessageObject = [self.queuedWormhole messageWithIdentifier:@"test"]); ) NSLog(@"%@", eachMessageObject);
+}];
+[self.queuedWormhole passMessageObject:@(6) identifier:@"test"]; // listener logs: 4 5 6
+messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
+```
+
 ## Getting Started
 
 - Install MMWormhole via CocoaPods or by downloading the Source files
@@ -30,7 +72,7 @@ The wormhole also supports CFNotificationCenter Darwin Notifications in an effor
 The MMWormhole Example app will only work with your shared App Group identifiers and Entitlements and is meant purely for reference
 
 ---
-##Installing MMWormhole
+## Installing MMWormhole
 <img src="https://cocoapod-badges.herokuapp.com/v/MMWormhole/badge.png"/><br/>
 You can install Wormhole in your project by using [CocoaPods](https://github.com/cocoapods/cocoapods):
 
