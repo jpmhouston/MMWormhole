@@ -28,6 +28,10 @@
 		55D935FC1A38A4F200AD1A1C /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 55D935FB1A38A4F200AD1A1C /* MainInterface.storyboard */; };
 		55D935FF1A38A4F200AD1A1C /* Today Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 55D935F21A38A4F200AD1A1C /* Today Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		55D936041A38A5C000AD1A1C /* MMWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = 2679DC1B1A33D37B00961787 /* MMWormhole.m */; };
+		8F807E771AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F807E761AB0A97C004DB710 /* MMQueuedWormhole.m */; };
+		8F807E781AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F807E761AB0A97C004DB710 /* MMQueuedWormhole.m */; };
+		8F807E791AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F807E761AB0A97C004DB710 /* MMQueuedWormhole.m */; };
+		8F807E7A1AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F807E761AB0A97C004DB710 /* MMQueuedWormhole.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +115,9 @@
 		55D935F91A38A4F200AD1A1C /* TodayViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TodayViewController.m; sourceTree = "<group>"; };
 		55D935FB1A38A4F200AD1A1C /* MainInterface.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainInterface.storyboard; sourceTree = "<group>"; };
 		55D936031A38A58900AD1A1C /* Today Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Today Extension.entitlements"; sourceTree = "<group>"; };
+		8F807E751AB0A97C004DB710 /* MMQueuedWormhole.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMQueuedWormhole.h; path = ../../../Source/MMQueuedWormhole.h; sourceTree = "<group>"; };
+		8F807E761AB0A97C004DB710 /* MMQueuedWormhole.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMQueuedWormhole.m; path = ../../../Source/MMQueuedWormhole.m; sourceTree = "<group>"; };
+		8F807E7B1AB0DD4A004DB710 /* MMWormhole-Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "MMWormhole-Private.h"; path = "../../../Source/MMWormhole-Private.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -275,6 +282,9 @@
 			children = (
 				2679DC1A1A33D37B00961787 /* MMWormhole.h */,
 				2679DC1B1A33D37B00961787 /* MMWormhole.m */,
+				8F807E7B1AB0DD4A004DB710 /* MMWormhole-Private.h */,
+				8F807E751AB0A97C004DB710 /* MMQueuedWormhole.h */,
+				8F807E761AB0A97C004DB710 /* MMQueuedWormhole.m */,
 			);
 			name = MMWormhole;
 			sourceTree = "<group>";
@@ -514,6 +524,7 @@
 				2679DBC51A33B7C700961787 /* AppDelegate.m in Sources */,
 				2679DC1C1A33D37B00961787 /* MMWormhole.m in Sources */,
 				2679DBC21A33B7C700961787 /* main.m in Sources */,
+				8F807E771AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -522,6 +533,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2679DBDC1A33B7C700961787 /* MMWormholeTests.m in Sources */,
+				8F807E781AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -529,6 +541,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F807E791AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */,
 				2679DC1D1A33D37B00961787 /* MMWormhole.m in Sources */,
 				2679DBF81A33C45200961787 /* InterfaceController.m in Sources */,
 			);
@@ -538,6 +551,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F807E7A1AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */,
 				55D936041A38A5C000AD1A1C /* MMWormhole.m in Sources */,
 				55D935FA1A38A4F200AD1A1C /* TodayViewController.m in Sources */,
 			);
