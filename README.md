@@ -37,29 +37,26 @@ MMQueuedWormhole gives you:
 ```objective-c
 [self.queuedWormhole passMessageObject:@(1) identifier:@"test"];
 [self.queuedWormhole passMessageObject:@(2) identifier:@"test"];
-messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // 1
+id messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // 1
 messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // 2
 messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
 ```
 
-Also, listening works like this:
+Upon starting a listener, its immediately called once for each message already queued.
+My earlier testing of Darwin Notifications found that a message sent which app returns is in the background
+will be delivered when the app returns to the foreground. (Or are "app is inactive .. becomes active" the correct terms in this case?)
+Or perhaps only the last one is delivered? In either case, a MMQueuedWormhole's listener will be called with each message in order.
 
 ```objective-c
 [self.queuedWormhole passMessageObject:@(1) identifier:@"test"];
 [self.queuedWormhole passMessageObject:@(2) identifier:@"test"];
-[self.queuedWormhole listenForMessageWithIdentifier:@"test" listener:^(id messageObject) { NSLog(@"%@", messageObject); }];
-[self.queuedWormhole passMessageObject:@(3) identifier:@"test"]; // lister logs: 3
-messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
+[self.queuedWormhole listenForMessageWithIdentifier:@"test" listener:^(id messageObject) {...}]; // called with messages 1, 2
+[self.queuedWormhole passMessageObject:@(3) identifier:@"test"]; // lister block called with message 3
+id messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
 [self.queuedWormhole stopListeningForMessageWithIdentifier:@"test"];
-
-[self.queuedWormhole passMessageObject:@(4) identifier:@"test"];
-[self.queuedWormhole passMessageObject:@(5) identifier:@"test"];
-[self.queuedWormhole listenForMessageWithIdentifier:@"test" listener:^(id messageObject) {
-    for (id eachMessageObject; (eachMessageObject = [self.queuedWormhole messageWithIdentifier:@"test"]); ) NSLog(@"%@", eachMessageObject);
-}];
-[self.queuedWormhole passMessageObject:@(6) identifier:@"test"]; // listener logs: 4 5 6
-messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
 ```
+
+(end of jpmhouston's addition)
 
 ## Getting Started
 
