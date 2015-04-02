@@ -415,7 +415,7 @@
 				TargetAttributes = {
 					2679DBBB1A33B7C700961787 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = RLNA7ZSN7E;
+						DevelopmentTeam = E8E9E89DS6;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -428,7 +428,7 @@
 					};
 					2679DBEE1A33C45200961787 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = RLNA7ZSN7E;
+						DevelopmentTeam = E8E9E89DS6;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -437,11 +437,11 @@
 					};
 					2679DBFC1A33C45200961787 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = RLNA7ZSN7E;
+						DevelopmentTeam = E8E9E89DS6;
 					};
 					55D935F11A38A4F200AD1A1C = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = RLNA7ZSN7E;
+						DevelopmentTeam = E8E9E89DS6;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
