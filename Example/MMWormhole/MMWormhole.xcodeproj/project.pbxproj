@@ -32,6 +32,7 @@
 		8F807E781AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F807E761AB0A97C004DB710 /* MMQueuedWormhole.m */; };
 		8F807E791AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F807E761AB0A97C004DB710 /* MMQueuedWormhole.m */; };
 		8F807E7A1AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F807E761AB0A97C004DB710 /* MMQueuedWormhole.m */; };
+		8F959D671ACC683E00FC1FAF /* MMQueuedWormholeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F959D661ACC683E00FC1FAF /* MMQueuedWormholeTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,6 +119,7 @@
 		8F807E751AB0A97C004DB710 /* MMQueuedWormhole.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMQueuedWormhole.h; path = ../../../Source/MMQueuedWormhole.h; sourceTree = "<group>"; };
 		8F807E761AB0A97C004DB710 /* MMQueuedWormhole.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMQueuedWormhole.m; path = ../../../Source/MMQueuedWormhole.m; sourceTree = "<group>"; };
 		8F807E7B1AB0DD4A004DB710 /* MMWormhole-Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "MMWormhole-Private.h"; path = "../../../Source/MMWormhole-Private.h"; sourceTree = "<group>"; };
+		8F959D661ACC683E00FC1FAF /* MMQueuedWormholeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMQueuedWormholeTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +211,7 @@
 			isa = PBXGroup;
 			children = (
 				2679DBDB1A33B7C700961787 /* MMWormholeTests.m */,
+				8F959D661ACC683E00FC1FAF /* MMQueuedWormholeTests.m */,
 				2679DBD91A33B7C700961787 /* Supporting Files */,
 			);
 			path = MMWormholeTests;
@@ -532,6 +535,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F959D671ACC683E00FC1FAF /* MMQueuedWormholeTests.m in Sources */,
 				2679DBDC1A33B7C700961787 /* MMWormholeTests.m in Sources */,
 				8F807E781AB0A97C004DB710 /* MMQueuedWormhole.m in Sources */,
 			);

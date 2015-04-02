@@ -89,14 +89,14 @@ static NSString * const MMWormholeNotificationName = @"MMWormholeNotificationNam
     NSString *appGroupContainerPath = [appGroupContainer path];
     NSString *directoryPath = appGroupContainerPath;
     
-    if (self.directory != nil) {
+    if (directoryPath != nil && self.directory != nil) {
         directoryPath = [appGroupContainerPath stringByAppendingPathComponent:self.directory];
+        
+        [self.fileManager createDirectoryAtPath:directoryPath
+                    withIntermediateDirectories:YES
+                                     attributes:nil
+                                          error:NULL];
     }
-    
-    [self.fileManager createDirectoryAtPath:directoryPath
-                withIntermediateDirectories:YES
-                                 attributes:nil
-                                      error:NULL];
     
     return directoryPath;
 }

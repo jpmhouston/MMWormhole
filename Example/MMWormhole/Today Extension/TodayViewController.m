@@ -10,6 +10,7 @@
 #import <NotificationCenter/NotificationCenter.h>
 
 #import "MMWormhole.h"
+#import "MMQueuedWormhole.h"
 
 @interface TodayViewController () <NCWidgetProviding>
 
@@ -22,8 +23,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+#if 1
     self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
                                                          optionalDirectory:@"wormhole"];
+#else
+    self.wormhole = [[MMQueuedWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+                                                               optionalDirectory:@"wormhole"];
+#endif
 }
 
 - (void)viewWillAppear:(BOOL)animated {

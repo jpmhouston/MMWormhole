@@ -9,6 +9,7 @@
 #import "ViewController.h"
 
 #import "MMWormhole.h"
+#import "MMQueuedWormhole.h"
 
 @interface ViewController ()
 
@@ -25,6 +26,7 @@
     [super viewDidLoad];
 
     // Initialize the wormhole
+#if 1
     self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
                                                          optionalDirectory:@"wormhole"];
     
@@ -40,6 +42,20 @@
         NSNumber *number = [messageObject valueForKey:@"buttonNumber"];
         self.numberLabel.text = [number stringValue];
     }];
+
+#else
+    self.wormhole = [[MMQueuedWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+                                                               optionalDirectory:@"wormhole"];
+    
+    // Become a listener for any queued or future button messages to the wormhole
+    [self.wormhole listenForMessageWithIdentifier:@"button" listener:^(id messageObject) {
+        // The number is identified with the buttonNumber key in the message object
+        NSNumber *number = [messageObject valueForKey:@"buttonNumber"];
+        
+        NSString *labelText = self.numberLabel.text ? [self.numberLabel.text stringByAppendingString:@" "]: @"";
+        self.numberLabel.text = [labelText stringByAppendingString:[number stringValue]];
+    }];
+#endif
     
     [self segmentedControlValueDidChange:self.segmentedControl];
 }

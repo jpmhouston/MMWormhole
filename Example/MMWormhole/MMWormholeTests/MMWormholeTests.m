@@ -26,6 +26,9 @@
 
 @end
 
+//static NSString * const applicationGroupIdentifier = @"group.com.mutualmobile.wormhole";
+static NSString * const applicationGroupIdentifier = @"group.com.room1337.mmwormhole";
+
 @implementation MMWormholeTests
 
 - (void)setUp {
@@ -37,7 +40,7 @@
 }
 
 - (void)testMessagePassingDirectory {
-    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                 optionalDirectory:@"testDirectory"];
     NSString *messagePassingDirectoryPath = [wormhole messagePassingDirectoryPath];
     
@@ -47,7 +50,7 @@
 }
 
 - (void)testFilePathForIdentifier {
-    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                 optionalDirectory:@"testDirectory"];
     NSString *filePathForIdentifier = [wormhole filePathForIdentifier:@"testIdentifier"];
     
@@ -57,7 +60,7 @@
 }
 
 - (void)testFilePathForNilIdentifier {
-    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                 optionalDirectory:@"testDirectory"];
     NSString *filePathForIdentifier = [wormhole filePathForIdentifier:nil];
     
@@ -67,7 +70,7 @@
 }
 
 - (void)testPassingMessageWithNilIdentifier {
-    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                 optionalDirectory:@"testDirectory"];
     
     [wormhole passMessageObject:@{} identifier:nil];
@@ -76,7 +79,7 @@
 }
 
 - (void)testValidMessagePassing {
-    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                 optionalDirectory:@"testDirectory"];
     
     [wormhole deleteFileForIdentifier:@"testIdentifier"];
@@ -95,7 +98,7 @@
 }
 
 - (void)testFileWriting {
-    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                 optionalDirectory:@"testDirectory"];
     
     [wormhole deleteFileForIdentifier:@"testIdentifier"];
@@ -114,7 +117,7 @@
 }
 
 - (void)testClearingIndividualMessage {
-    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                 optionalDirectory:@"testDirectory"];
     
     [wormhole passMessageObject:@{} identifier:@"testIdentifier"];
@@ -137,7 +140,7 @@
 }
 
 - (void)testClearingAllMessages {
-    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                 optionalDirectory:@"testDirectory"];
     
     [wormhole passMessageObject:@{} identifier:@"testIdentifier1"];
@@ -156,7 +159,7 @@
 }
 
 - (void)testMessageListening {
-    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                 optionalDirectory:@"testDirectory"];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Listener should hear something"];
@@ -166,6 +169,8 @@
         
         [expectation fulfill];
     }];
+    
+    [wormhole passMessageObject:@{} identifier:@"testIdentifier"];
     
     // Simulate a fake notification since Darwin notifications aren't delivered to the sender
     
@@ -177,7 +182,7 @@
 }
 
 - (void)testStopMessageListening {
-    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                 optionalDirectory:@"testDirectory"];
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"Listener should hear something"];
@@ -187,6 +192,8 @@
         
         [expectation fulfill];
     }];
+    
+    [wormhole passMessageObject:@{} identifier:@"testIdentifier"];
     
     // Simulate a fake notification since Darwin notifications aren't delivered to the sender
     
@@ -209,7 +216,7 @@
 
 - (void)testMessagePassingPerformance {
     [self measureBlock:^{
-        MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+        MMWormhole *wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:applicationGroupIdentifier
                                                                     optionalDirectory:@"testDirectory"];
     
         [wormhole passMessageObject:[self performanceSampleJSONObject] identifier:@"testPerformance"];
