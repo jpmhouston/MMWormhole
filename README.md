@@ -4,6 +4,8 @@ MMWormhole creates a bridge between an iOS or OS X extension and it's containing
 
 The wormhole also supports CFNotificationCenter Darwin Notifications in an effort to support realtime change notifications. When a message is passed to the wormhole, interested parties can listen and be notified of these changes on either side of the wormhole. The effect is nearly instant updates on either side when a message is sent through the wormhole.
 
+> This MMWormhole fork adds the MMQueuedWormhole subclass, see "This Fork" near the end of this file.
+
 <p align="center">
 <img src="MMWormhole.gif") alt="Example App"/>
 </p>
@@ -18,45 +20,6 @@ The wormhole also supports CFNotificationCenter Darwin Notifications in an effor
     self.numberLabel.text = [messageObject[@"buttonNumber"] stringValue];
 }];
 ```
-
-## This Fork
-
-This MMWormhole fork adds subclass MMQueuedWormhole, with which every message given to passMessageObject:identifier: is received in order by multiple calls to messageWithIdentifier:.
-
-So instead of this behaviour with MMWormhole:
-
-```objective-c
-[self.wormhole passMessageObject:@(1) identifier:@"test"];
-[self.wormhole passMessageObject:@(2) identifier:@"test"];
-id messageObject = [self.wormhole messageWithIdentifier:@"test"]; // 2
-messageObject = [self.wormhole messageWithIdentifier:@"test"]; // 2
-```
-
-MMQueuedWormhole gives you:
-
-```objective-c
-[self.queuedWormhole passMessageObject:@(1) identifier:@"test"];
-[self.queuedWormhole passMessageObject:@(2) identifier:@"test"];
-id messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // 1
-messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // 2
-messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
-```
-
-Upon starting a listener, its immediately called once for each message already queued.
-My earlier testing of Darwin Notifications found that a message sent which app returns is in the background
-will be delivered when the app returns to the foreground. (Or are "app is inactive .. becomes active" the correct terms in this case?)
-Or perhaps only the last one is delivered? In either case, a MMQueuedWormhole's listener will be called with each message in order.
-
-```objective-c
-[self.queuedWormhole passMessageObject:@(1) identifier:@"test"];
-[self.queuedWormhole passMessageObject:@(2) identifier:@"test"];
-[self.queuedWormhole listenForMessageWithIdentifier:@"test" listener:^(id messageObject) {...}]; // called with messages 1, 2
-[self.queuedWormhole passMessageObject:@(3) identifier:@"test"]; // lister block called with message 3
-id messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
-[self.queuedWormhole stopListeningForMessageWithIdentifier:@"test"];
-```
-
-(end of jpmhouston's addition)
 
 ## Getting Started
 
@@ -76,6 +39,15 @@ You can install Wormhole in your project by using [CocoaPods](https://github.com
 ```Ruby
 pod 'MMWormhole', '~> 1.1.1'
 ```
+
+### Installing This Fork
+
+I think this might work. The future of this fork is still uncertain.
+
+```Ruby
+pod 'MMWormhole', :git => 'https://github.com/jpmhouston/MMWormhole'
+```
+
 
 ## Overview
 
@@ -122,6 +94,43 @@ You can also listen for changes to that message and be notified when that messag
     // Do Something
 }];
 
+```
+
+## This Fork
+
+This MMWormhole fork adds the MMQueuedWormhole subclass, with which every message given to passMessageObject:identifier: is received in order by multiple calls to messageWithIdentifier:.
+
+So instead of this behaviour with MMWormhole:
+
+```objective-c
+[self.wormhole passMessageObject:@(1) identifier:@"test"];
+[self.wormhole passMessageObject:@(2) identifier:@"test"];
+id messageObject = [self.wormhole messageWithIdentifier:@"test"]; // 2
+messageObject = [self.wormhole messageWithIdentifier:@"test"]; // 2
+```
+
+MMQueuedWormhole gives you:
+
+```objective-c
+[self.queuedWormhole passMessageObject:@(1) identifier:@"test"];
+[self.queuedWormhole passMessageObject:@(2) identifier:@"test"];
+id messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // 1
+messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // 2
+messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
+```
+
+Upon starting a listener, its immediately called once for each message already queued.
+My earlier testing of Darwin Notifications found that a message sent which app returns is in the background
+will be delivered when the app returns to the foreground. (Or are "app is inactive .. becomes active" the correct terms in this case?)
+Or perhaps only the last one is delivered? In either case, a MMQueuedWormhole's listener will be called with each message in order.
+
+```objective-c
+[self.queuedWormhole passMessageObject:@(1) identifier:@"test"];
+[self.queuedWormhole passMessageObject:@(2) identifier:@"test"];
+[self.queuedWormhole listenForMessageWithIdentifier:@"test" listener:^(id messageObject) {...}]; // called with messages 1, 2
+[self.queuedWormhole passMessageObject:@(3) identifier:@"test"]; // lister block called with message 3
+id messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
+[self.queuedWormhole stopListeningForMessageWithIdentifier:@"test"];
 ```
 
 ### Designing Your Communication Scheme
