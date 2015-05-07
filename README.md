@@ -96,6 +96,11 @@ You can also listen for changes to that message and be notified when that messag
 
 ```
 
+### Designing Your Communication Scheme
+
+You can think of message passing between apps and extensions sort of like a web service. The web service has endpoints that you can read and write. The message identifiers for your MMWormhole messages can be thought of in much the same way. A great practice is to design very clear message identifiers so that you immediately know when reading your code who sent the message and why, and what the possible contents of the message might be. Just like you would design a web service with clear semantics, you should do the same with your wormhole messaging scheme.
+
+
 ## This Fork
 
 This MMWormhole fork adds the MMQueuedWormhole subclass, with which every message given to passMessageObject:identifier: is received in order by multiple calls to messageWithIdentifier:.
@@ -120,9 +125,9 @@ messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
 ```
 
 Upon starting a listener, its immediately called once for each message already queued.
-My earlier testing of Darwin Notifications found that a message sent which app returns is in the background
+My earlier testing of Darwin Notifications found that a notification sent when the receiving app is in the background
 will be delivered when the app returns to the foreground. (Or are "app is inactive .. becomes active" the correct terms in this case?)
-Or perhaps only the last one is delivered? In either case, a MMQueuedWormhole's listener will be called with each message in order.
+And if many are sent then it seems only the last one is delivered. MMQueuedWormhole isolates your code from this complication and a listener will be called with each message in order as soon as possible.
 
 ```objective-c
 [self.queuedWormhole passMessageObject:@(1) identifier:@"test"];
@@ -133,9 +138,16 @@ id messageObject = [self.queuedWormhole messageWithIdentifier:@"test"]; // nil
 [self.queuedWormhole stopListeningForMessageWithIdentifier:@"test"];
 ```
 
-### Designing Your Communication Scheme
+There's now also an extension to the MMQueuedWormhole API for receiving all queued messages in an array instead of one at a time, they are `messagesWithIdentifier:` and `listenForMessagesWithIdentifier:listener:` (note the plural). Example:
 
-You can think of message passing between apps and extensions sort of like a web service. The web service has endpoints that you can read and write. The message identifiers for your MMWormhole messages can be thought of in much the same way. A great practice is to design very clear message identifiers so that you immediately know when reading your code who sent the message and why, and what the possible contents of the message might be. Just like you would design a web service with clear semantics, you should do the same with your wormhole messaging scheme.
+```objective-c
+[self.queuedWormhole passMessageObject:@(1) identifier:@"test"];
+[self.queuedWormhole passMessageObject:@(2) identifier:@"test"];
+[self.queuedWormhole listenForMessagesWithIdentifier:@"test" listener:^(NSArray *a) {...}]; // called with message array [1, 2]
+[self.queuedWormhole stopListeningForMessageWithIdentifier:@"test"];
+[self.queuedWormhole passMessageObject:@(3) identifier:@"test"];
+NSArray *messageObjects = [self.queuedWormhole messagesWithIdentifier:@"test"]; // [3]
+```
 
 
 ## Requirements
@@ -146,6 +158,8 @@ MMWormhole requires iOS 7.0 or higher or OS X 10.10 or higher.
 ## Credits
 
 MMWormhole was created by [Conrad Stoll](http://conradstoll.com) at [Mutual Mobile](http://www.mutualmobile.com).
+
+MMQueuedWormhole subclass was created by [Pierre Houston](https://smallduck.wordpress.com) at [Room 1337](http://room1337.com).
 
 Credit also to [Wade Spires](https://devforums.apple.com/people/mindsaspire), [Tom Harrington](https://twitter.com/atomicbird), and [Rene Cacheaux](https://twitter.com/rcachatx) for work and inspiration surrounding notifications between the containing app and it's extensions.
 
