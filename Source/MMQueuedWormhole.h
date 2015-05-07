@@ -51,4 +51,11 @@
 - (void)listenForMessagesWithIdentifier:(NSString *)identifier
                                listener:(void (^)(NSArray *messageObjects))listener;
 
+/**
+ This method is synonomous with stopListeningForMessageWithIdentifier: (name is pluralized).
+ It should be used to balance calls to listenForMessagesWithIdentifier:listener:, although
+ currently calling either would work (but that may not be true in future versions of this class).
+ */
+- (void)stopListeningForMessagesWithIdentifier:(NSString *)identifier;
+
 @end
