@@ -55,8 +55,13 @@ static NSString * const MMWormholeNotificationName = @"MMWormholeNotificationNam
                                  optionalDirectory:(NSString *)directory {
     if ((self = [super init])) {
         
-        if (NO == [[NSFileManager defaultManager] respondsToSelector:@selector(containerURLForSecurityApplicationGroupIdentifier:)]) {
+        if (![[NSFileManager defaultManager] respondsToSelector:@selector(containerURLForSecurityApplicationGroupIdentifier:)]) {
             //Protect the user of a crash because of iOSVersion < iOS7
+            return nil;
+        }
+        
+        if ([[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:identifier] == nil) {
+            NSLog(@"containerURLForSecurityApplicationGroupIdentifier \"%@\" returned nil! app bundle id or entitlements must be incorrect, failing init of MMWormhole ", identifier);
             return nil;
         }
         
@@ -254,8 +259,11 @@ void wormholeNotificationCallback(CFNotificationCenterRef center,
 - (void)listenForMessageWithIdentifier:(NSString *)identifier
                               listener:(void (^)(id messageObject))listener {
     if (identifier != nil) {
+        BOOL newRegistration = (self.listenerBlocks[identifier] == nil);
         [self.listenerBlocks setValue:listener forKey:identifier];
-        [self registerForNotificationsWithIdentifier:identifier];
+        if (newRegistration) {
+            [self registerForNotificationsWithIdentifier:identifier];
+        }
     }
 }
 

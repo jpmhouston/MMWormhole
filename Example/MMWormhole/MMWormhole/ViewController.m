@@ -42,18 +42,35 @@
         NSNumber *number = [messageObject valueForKey:@"buttonNumber"];
         self.numberLabel.text = [number stringValue];
     }];
-
-#else
-    self.wormhole = [[MMQueuedWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.room1337.mmqueuedwormhole"
-                                                               optionalDirectory:@"wormhole"];
+    
+#elif 0
+    MMQueuedWormhole *queuedWormhole = [[MMQueuedWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.room1337.mmqueuedwormhole"
+                                                                                  optionalDirectory:@"wormhole"];
+    self.wormhole = queuedWormhole;
     
     // Become a listener for any queued or future button messages to the wormhole
     [self.wormhole listenForMessageWithIdentifier:@"button" listener:^(id messageObject) {
         // The number is identified with the buttonNumber key in the message object
         NSNumber *number = [messageObject valueForKey:@"buttonNumber"];
         
-        NSString *labelText = self.numberLabel.text ? [self.numberLabel.text stringByAppendingString:@" "]: @"";
-        self.numberLabel.text = [labelText stringByAppendingString:[number stringValue]];
+        NSString *labelText = (self.numberLabel.text.length > 0) ? [self.numberLabel.text stringByAppendingString:@" "]: @"";
+        self.numberLabel.text = [labelText stringByAppendingString:number ? [number stringValue] : @"?"];
+    }];
+    
+#else
+    MMQueuedWormhole *queuedWormhole = [[MMQueuedWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.room1337.mmqueuedwormhole"
+                                                                                  optionalDirectory:@"wormhole"];
+    self.wormhole = queuedWormhole;
+    
+    // Become a listener for any queued or future button messages to the wormhole
+    [queuedWormhole listenForMessagesWithIdentifier:@"button" listener:^(NSArray *messageObjects) {
+        for (id messageObject in messageObjects) {
+            // The number is identified with the buttonNumber key in the message object
+            NSNumber *number = [messageObject valueForKey:@"buttonNumber"];
+            
+            NSString *labelText = (self.numberLabel.text.length > 0) ? [self.numberLabel.text stringByAppendingString:@" "]: @"";
+            self.numberLabel.text = [labelText stringByAppendingString:number ? [number stringValue] : @"?"];
+        }
     }];
 #endif
     
@@ -66,6 +83,10 @@
     // Pass a message for the selection identifier. The message itself is a NSCoding compliant object
     // with a single value and key called selectionString.
     [self.wormhole passMessageObject:@{@"selectionString" : title} identifier:@"selection"];
+    
+    // test -- also send a button message when pressing 3rd segment
+    if (segmentedControl.selectedSegmentIndex == 2)
+        [self.wormhole passMessageObject:@{@"buttonNumber" : @99} identifier:@"button"];
 }
 
 @end
