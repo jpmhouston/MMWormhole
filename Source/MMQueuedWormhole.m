@@ -9,6 +9,11 @@
 #import "MMQueuedWormhole.h"
 #import "MMWormhole-Private.h"
 
+@interface MMQueuedWormhole ()
+@property (nonatomic, strong) NSMutableSet *pluralListeners;
+@end
+
+
 @implementation MMQueuedWormhole
 
 #pragma mark - Private File Operation Methods
@@ -138,7 +143,7 @@
     }
     
     NSData *data = [NSData dataWithContentsOfFile:uniquePath options:NSDataReadingUncached error:errorPtr];
-    [[NSFileManager defaultManager] removeItemAtPath:filePath error:NULL];
+    [[NSFileManager defaultManager] removeItemAtPath:uniquePath error:NULL];
     return data;
 }
 
@@ -198,7 +203,7 @@
         }
         
         // if race between multiple writers and writeToFile fails because a file already exists, then pick new number and try again
-        if (error.code == 0) { // !!!
+        if ([error.domain isEqualToString:NSCocoaErrorDomain] && error.code == NSFileWriteFileExistsError) {
             filePath = [self filePathForIdentifier:identifier withFileNumber:++fileNumber];
             if (filePath != nil) { // only ever expect it to be nil if fileNumber wraps around to become negative
                 continue;
@@ -208,7 +213,7 @@
         return NO; // any other case of !success
     }
     
-    [self sendNotificationForMessageWithIdentifier:identifier];
+    [self sendNotificationForMessageWithIdentifier:identifier]; // !!! fileNumber:fileNumber
     
     if (fileNumberPtr) {
         *fileNumberPtr = fileNumber;
@@ -279,41 +284,114 @@
 
 #pragma mark - Private Notification Methods
 
+// !!! maybe include this to pass # along with identifier to didReceiveMessageNotification
+//     also see commented out code in didReceiveMessageNotification:
+//
+//- (void)sendNotificationForMessageWithIdentifier:(NSString *)identifier fileNumber:(NSInteger)sendingFileNumber {
+//    CFNotificationCenterRef const center = CFNotificationCenterGetDarwinNotifyCenter();
+//    CFDictionaryRef const userInfo = (__bridge CFDictionaryRef)@{ @"number": @(sendingFileNumber) };
+//    BOOL const deliverImmediately = YES;
+//    CFStringRef str = (__bridge CFStringRef)identifier;
+//    CFNotificationCenterPostNotification(center, str, NULL, userInfo, deliverImmediately);
+//}
+//
+//- (void)registerForNotificationsWithIdentifier:(NSString *)identifier {
+//    CFNotificationCenterRef const center = CFNotificationCenterGetDarwinNotifyCenter();
+//    CFStringRef str = (__bridge CFStringRef)identifier;
+//    CFNotificationCenterAddObserver(center,
+//                                    (__bridge const void *)(self),
+//                                    queuedWormholeNotificationCallback,
+//                                    str,
+//                                    NULL,
+//                                    CFNotificationSuspensionBehaviorDeliverImmediately);
+//}
+//
+//void queuedWormholeNotificationCallback(CFNotificationCenterRef center,
+//                                        void * observer,
+//                                        CFStringRef name,
+//                                        void const * object,
+//                                        CFDictionaryRef userInfo) {
+//    NSString *identifier = (__bridge NSString *)name;
+//    NSMutableDictionary *forwardUserInfo = [NSMutableDictionary dictionaryWithDictionary:@{@"identifier" : identifier}];
+//    if (userInfo) {
+//        [forwardUserInfo addEntriesFromDictionary:(__bridge NSDictionary *)userInfo];
+//    }
+//    [[NSNotificationCenter defaultCenter] postNotificationName:MMWormholeNotificationName
+//                                                        object:nil
+//                                                      userInfo:forwardUserInfo];
+//}
+
 - (void)didReceiveMessageNotification:(NSNotification *)notification
 {
     typedef void (^MessageListenerBlock)(id messageObject);
     
     NSDictionary *userInfo = notification.userInfo;
     NSString *identifier = [userInfo valueForKey:@"identifier"];
-    NSString *fileNumberString = [userInfo valueForKey:@"number"];
-    NSInteger fileNumber = fileNumberString.integerValue;
+//    NSString *fileNumberString = [userInfo valueForKey:@"number"];
+//    NSInteger fileNumber = fileNumberString.integerValue;
     
     if (identifier != nil) {
         MessageListenerBlock listenerBlock = [self listenerBlockForIdentifier:identifier];
         
         if (listenerBlock) {
+            // immediately call listener for any queued messages
             
-            // if sender using base class and file number not given, delivers the first message only
-            // otherwise deliver all messages up to this file number
-            if (fileNumberString == nil) {
-                id messageObject = [self messageObjectFromFileWithIdentifier:identifier notGreaterThanFileNumber:-1];
-                
-                listenerBlock(messageObject);
+            // if more being posted while this receiver app is running, stop receiving at largest file number determined here
+            // not sure if this is worthwhile or not
+            NSInteger limitFileNumber = [self largestFileNumberForIdentifier:identifier];
+            
+//            // if sender using base class and file number not given, there should be only 1 message so call listener with it
+//            // otherwise call listener for any queued messages
+//            if (fileNumberString == nil) {
+//                id messageObject = [self messageObjectFromFileWithIdentifier:identifier notGreaterThanFileNumber:-1];
+//                if (messageObject) {
+//                    // if lister for this identifier expecting array, return single object wrapped in an array
+//                    listenerBlock([self.pluralListeners containsObject:identifier] ? @[ messageObject ] : messageObject);
+//                }
+//            }
+//            else {
+//            }
+            
+            // if lister for this identifier expecting array, create array for collecting messages
+            NSMutableArray *messageObjects = nil;
+            if ([self.pluralListeners containsObject:identifier]) {
+                messageObjects = [NSMutableArray array];
             }
-            else {
-                while (1) {
-                    id messageObject = [self messageObjectFromFileWithIdentifier:identifier notGreaterThanFileNumber:fileNumber];
-                    if (!messageObject) {
-                        break;
-                    }
-                    
+            
+            while (1) {
+                id messageObject = [self messageObjectFromFileWithIdentifier:identifier notGreaterThanFileNumber:limitFileNumber];
+                if (!messageObject) {
+                    break;
+                }
+                
+                // if exists an array for collecting messages, append each message object, otherwise call listener once for each
+                // in most use cases this will loop only once
+                if (messageObjects) {
+                    [messageObjects addObject:messageObject];
+                }
+                else {
                     listenerBlock(messageObject);
                 }
             }
             
+            // if exists an array for collecting objects, call listener once passing that array
+            if (messageObjects) {
+                listenerBlock(messageObjects);
+            }
+            
         }
-        
     }
+}
+
+
+#pragma mark - Private Property Lazy Initialization
+
+- (NSMutableSet *)pluralListeners
+{
+    if (!_pluralListeners) {
+        _pluralListeners = [NSMutableSet set];
+    }
+    return _pluralListeners;
 }
 
 
@@ -321,10 +399,78 @@
 
 - (void)listenForMessageWithIdentifier:(NSString *)identifier listener:(void (^)(id messageObject))listener
 {
-    [super listenForMessageWithIdentifier:identifier listener:listener];
-    
-    // immediately call listener for any existing queued messages
+    if (identifier != nil) {
+        // to fix race condition (removing pluralListeners inclusion for identifier before the old plural listener has been replaced)
+        // must remove the old listener first
+        if ([self.pluralListeners containsObject:identifier]) {
+            [super stopListeningForMessageWithIdentifier:identifier];
+        }
+        
+        [self.pluralListeners removeObject:identifier];
+        
+        [super listenForMessageWithIdentifier:identifier listener:listener];
+        
+        // immediately call listener for any existing queued messages
+        
+        // if more being posted while this receiver app is running, stop receiving at largest file number determined here
+        // not sure if this is worthwhile or not
+        NSInteger limitFileNumber = [self largestFileNumberForIdentifier:identifier];
+        
+        while (1) {
+            id messageObject = [self messageObjectFromFileWithIdentifier:identifier notGreaterThanFileNumber:limitFileNumber];
+            if (!messageObject) {
+                break;
+            }
+            
+            // call once for each message object, in most use cases this will loop only once
+            listener(messageObject);
+        }
+    }
+}
+
+- (void)listenForMessagesWithIdentifier:(NSString *)identifier listener:(void (^)(NSArray *messageObjects))listener
+{
+    if (identifier != nil) {
+        // to fix race condition (setting pluralListeners inclusion for identifier before the old singular listener has been replaced)
+        // must remove the old listener first
+        if (![self.pluralListeners containsObject:identifier]) {
+            [super stopListeningForMessageWithIdentifier:identifier];
+        }
+        
+        [self.pluralListeners addObject:identifier];
+        
+        [super listenForMessageWithIdentifier:identifier listener:listener];
+        
+        // immediately call listener if any existing queued messages
+        
+        // if more being posted while this receiver app is running, stop receiving at largest file number determined here
+        // not sure if this is worthwhile or not
+        NSInteger limitFileNumber = [self largestFileNumberForIdentifier:identifier];
+        
+        NSMutableArray *messageObjects = [NSMutableArray array];
+        
+        while (1) {
+            id messageObject = [self messageObjectFromFileWithIdentifier:identifier notGreaterThanFileNumber:limitFileNumber];
+            if (!messageObject) {
+                break;
+            }
+            
+            // append each message object to the array, in most use cases this will loop only once
+            [messageObjects addObject:messageObject];
+        }
+        
+        // if any message objects collected, call listener once passing that array
+        if (messageObjects.count > 0) {
+            listener(messageObjects);
+        }
+    }
+}
+
+- (NSArray *)messagesWithIdentifier:(NSString *)identifier
+{
     NSInteger limitFileNumber = [self largestFileNumberForIdentifier:identifier];
+    
+    NSMutableArray *messageObjects = [NSMutableArray array];
     
     while (1) {
         id messageObject = [self messageObjectFromFileWithIdentifier:identifier notGreaterThanFileNumber:limitFileNumber];
@@ -332,8 +478,12 @@
             break;
         }
         
-        listener(messageObject);
+        // append each message object to the array, in most use cases this will loop only once
+        [messageObjects addObject:messageObject];
     }
+    
+    // if any message objects collected, return that array, otherwise return nil
+    return (messageObjects.count > 0) ? messageObjects : nil;
 }
 
 @end

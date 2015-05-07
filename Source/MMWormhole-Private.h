@@ -14,6 +14,7 @@
 
 - (NSString *)messagePassingDirectoryPath;
 - (NSString *)filePathForIdentifier:(NSString *)identifier;
+//- (void)registerForNotificationsWithIdentifier:(NSString *)identifier;
 - (void)sendNotificationForMessageWithIdentifier:(NSString *)identifier;
 - (void)didReceiveMessageNotification:(NSNotification *)notification;
 - (id)listenerBlockForIdentifier:(NSString *)identifier;
