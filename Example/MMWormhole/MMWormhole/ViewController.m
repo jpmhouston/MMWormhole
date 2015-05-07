@@ -26,8 +26,8 @@
     [super viewDidLoad];
 
     // Initialize the wormhole
-#if 1
-    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+#if 0
+    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.room1337.mmqueuedwormhole"
                                                          optionalDirectory:@"wormhole"];
     
     // Obtain an initial message from the wormhole
@@ -44,7 +44,7 @@
     }];
 
 #else
-    self.wormhole = [[MMQueuedWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    self.wormhole = [[MMQueuedWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.room1337.mmqueuedwormhole"
                                                                optionalDirectory:@"wormhole"];
     
     // Become a listener for any queued or future button messages to the wormhole

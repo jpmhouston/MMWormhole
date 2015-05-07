@@ -23,11 +23,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-#if 1
-    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+#if 0
+    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.room1337.mmqueuedwormhole"
                                                          optionalDirectory:@"wormhole"];
 #else
-    self.wormhole = [[MMQueuedWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    self.wormhole = [[MMQueuedWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.room1337.mmqueuedwormhole"
                                                                optionalDirectory:@"wormhole"];
 #endif
 }

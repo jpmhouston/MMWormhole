@@ -28,7 +28,7 @@
     [super awakeWithContext:context];
 
     // Initialize the wormhole
-    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.mutualmobile.wormhole"
+    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:@"group.com.room1337.mmqueuedwormhole"
                                                          optionalDirectory:@"wormhole"];
         
     // Obtain an initial value for the selection message from the wormhole

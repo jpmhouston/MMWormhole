@@ -48,7 +48,7 @@
 @end
 
 //static NSString * const applicationGroupIdentifier = @"group.com.mutualmobile.wormhole";
-static NSString * const applicationGroupIdentifier = @"group.com.room1337.mmwormhole";
+static NSString * const applicationGroupIdentifier = @"group.com.room1337.mmqueuedwormhole";
 
 @interface MMQueuedWormholeTests : XCTestCase
 
