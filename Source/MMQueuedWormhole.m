@@ -466,6 +466,13 @@
     }
 }
 
+- (void)stopListeningForMessagesWithIdentifier:(NSString *)identifier
+{
+    [super stopListeningForMessageWithIdentifier:identifier];
+    
+    [self.pluralListeners removeObject:identifier];
+}
+
 - (NSArray *)messagesWithIdentifier:(NSString *)identifier
 {
     NSInteger limitFileNumber = [self largestFileNumberForIdentifier:identifier];
