@@ -9,6 +9,10 @@
 #import "MMQueuedWormhole.h"
 #import "MMWormhole-Private.h"
 
+#if !__has_feature(objc_arc)
+#error This class requires automatic reference counting
+#endif
+
 @interface MMQueuedWormhole ()
 @property (nonatomic, strong) NSMutableSet *pluralListeners;
 @end
